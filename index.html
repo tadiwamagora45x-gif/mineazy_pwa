@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#131313"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<title>Mineazy Sales Assistant</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%23FABD00'/><text x='96' y='130' text-anchor='middle' font-size='100' font-weight='bold' fill='%23261A00'>M</text></svg>"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>:root{--bg:#131313;--surf-dim:#131313;--surf:#201f1f;--surf-low:#1c1b1b;--surf-high:#2a2a2a;--surf-highest:#353534;--txt:#e5e2e1;--txt-var:#d4c5ab;--outline:#9c8f78;--outline-var:#4f4632;--primary:#ffe4af;--primary-dim:#fabd00;--primary-container:#ffc107;--on-primary-container:#6d5100;--on-primary-fixed:#261a00;--secondary:#ffbf81;--secondary-container:#ff9800;--on-secondary-container:#653900;--tertiary:#d9e8ff;--error:#ffb4ab;--error-container:#93000a;--on-error:#690005;--green:#4caf50;--green-bg:rgba(76,175,80,0.2);--orange:#ff9800;--orange-bg:rgba(255,152,0,0.2);--red:#ff5252;--red-bg:rgba(255,82,82,0.15);--touch:48px;--gutter:16px;--radius:4px;--radius-lg:8px;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);font-size:14px;line-height:1.428;background:var(--bg);color:var(--txt);min-height:100dvh;overflow-x:hidden;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+.material-symbols-outlined{font-variation-settings:'FILL'0,'wght'400,'GRAD'0,'opsz'24;font-size:24px;line-height:1}
+input,button{font-family:inherit}
+button{cursor:pointer;border:none;background:none;color:inherit}
+input{outline:none;border:1px solid var(--outline-var);background:var(--surf-low);color:var(--txt);padding:12px 14px;border-radius:var(--radius);font-size:16px;width:100%}
+input:focus{border-color:var(--primary);border-width:2px}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--outline-var);border-radius:10px}
+#app{max-width:480px;margin:0 auto;position:relative;min-height:100dvh}
+.screen{display:none;padding-bottom:80px;animation:fadeIn .2s ease}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.topbar{display:flex;align-items:center;justify-content:space-between;height:var(--touch);padding:0 var(--gutter);background:var(--surf);border-bottom:1px solid var(--outline-var);position:sticky;top:0;z-index:50}
+.topbar h1{font-size:20px;font-weight:700;color:var(--primary-dim);letter-spacing:-1px;text-transform:uppercase}
+.topbar .actions{display:flex;gap:8px}
+.topbar .actions button{padding:8px;border-radius:50%}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:64px;display:flex;background:var(--surf);border-top:1px solid var(--outline-var);z-index:50}
+.bottom-nav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--txt-var);font-size:11px;font-weight:700;letter-spacing:0.05em;text-decoration:none;gap:2px;transition:color .2s}
+.bottom-nav a.active{color:var(--primary-dim)}
+.bottom-nav a.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:32px;height:2px;background:var(--primary-dim)}
+.bottom-nav a{position:relative;padding-top:6px}
+.card{background:var(--surf);border:1px solid var(--outline-var);border-radius:var(--radius);padding:var(--gutter)}
+.card-glow{border:1px solid var(--outline-var);box-shadow:0 0 10px rgba(250,189,0,.15)}
+.section-title{font-size:12px;font-weight:700;letter-spacing:0.05em;color:var(--txt-var);text-transform:uppercase;margin-bottom:8px}
+.btn{padding:12px 20px;border-radius:var(--radius);font-weight:700;font-size:14px;letter-spacing:0.5px;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;border:1px solid transparent;width:100%}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--primary-container);color:var(--on-primary-container);border-color:var(--primary-dim)}
+.btn-outline{background:transparent;color:var(--primary-dim);border:2px solid var(--primary-dim)}
+.btn-danger{background:transparent;color:var(--error);border:2px solid var(--error)}
+.btn-success{background:var(--green);color:#000}
+.btn-ghost{background:var(--surf-highest);color:var(--txt-var);border-color:var(--outline-var)}
+.btn:disabled{opacity:.4;pointer-events:none}
+.badge{display:inline-flex;padding:2px 8px;border-radius:2px;font-size:10px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase}
+.badge-green{background:var(--green-bg);color:var(--green);border:1px solid rgba(76,175,80,.5)}
+.badge-orange{background:var(--orange-bg);color:var(--orange);border:1px solid rgba(255,152,0,.5)}
+.badge-red{background:var(--red-bg);color:var(--red);border:1px solid rgba(255,82,82,.5)}
+.badge-yellow{background:rgba(250,189,0,.15);color:var(--primary-dim);border:1px solid rgba(250,189,0,.4)}
+.mono{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.02em}
+.mono-sm{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.02em}
+.text-primary{color:var(--primary-dim)}
+.text-secondary{color:var(--secondary-container)}
+.text-muted{color:var(--txt-var)}
+.text-green{color:var(--green)}
+.text-red{color:var(--red)}
+.text-orange{color:var(--orange)}
+.mt-4{margin-top:16px}
+.mb-4{margin-bottom:16px}
+.gap-8{gap:8px}
+.gap-12{gap:12px}
+.gap-16{gap:16px}
+.flex{display:flex}
+.flex-col{flex-direction:column}
+.items-center{align-items:center}
+.justify-between{justify-content:space-between}
+.gap-8{gap:8px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.w-full{width:100%}
+.text-center{text-align:center}
+.font-bold{font-weight:700}
+.p-gutter{padding:var(--gutter)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surf);border:1px solid var(--outline-var);border-radius:var(--radius-lg);padding:24px;width:100%;max-width:400px;max-height:85vh;overflow-y:auto}
+.modal h3{font-size:20px;font-weight:700;color:var(--primary-dim);margin-bottom:16px;text-transform:uppercase}
+.spinner{width:20px;height:20px;border:2px solid var(--outline-var);border-top-color:var(--primary-dim);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pulse{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--surf-high);color:var(--txt);padding:12px 20px;border-radius:var(--radius);font-size:14px;font-weight:500;z-index:200;border:1px solid var(--outline-var);max-width:90%;text-align:center;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.stat-card{background:var(--surf);border:1px solid var(--outline-var);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;gap:6px}
+.stat-card .label{font-size:10px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:var(--txt-var)}
+.stat-card .value{font-size:28px;font-weight:700;letter-spacing:-1px;color:var(--primary-dim);line-height:1}
+.stat-card.pulse-card{border-color:var(--secondary-container);border-width:2px;background:var(--surf-highest)}
+.stat-card.pulse-card .value{color:var(--secondary-container)}
+.progress-bar{height:10px;background:var(--surf-highest);border-radius:99px;border:1px solid var(--outline-var);overflow:hidden}
+.progress-bar .fill{height:100%;background:var(--primary-dim);border-radius:99px;transition:width .5s;box-shadow:0 0 10px rgba(250,189,0,.3)}
+.cat-tab.active{background:var(--primary-dim);color:var(--on-primary-fixed);border-color:var(--primary-dim)!important}
+.qty-ctrl{display:inline-flex;align-items:center;gap:0;background:var(--surf-low);border:1px solid var(--outline-var);border-radius:var(--radius)}
+.qty-ctrl button{padding:8px 12px;color:var(--txt);font-size:18px;font-weight:700}
+.qty-ctrl .qty{padding:4px 16px;font-family:var(--mono);font-weight:700;font-size:15px;min-width:32px;text-align:center}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--txt-var);gap:12px}
+.empty-state .icon{font-size:64px;opacity:.25}
+/* Login screen */
+.login-bg{display:flex;align-items:center;justify-content:center;min-height:100dvh;padding:24px}
+.login-card{width:100%;max-width:360px;text-align:center}
+.login-card .logo{width:72px;height:72px;background:var(--primary-dim);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.login-card .logo .material-symbols-outlined{font-size:40px;color:var(--on-primary-fixed)}
+.login-card h1{font-size:28px;font-weight:700;color:var(--primary-dim);letter-spacing:-2px}
+/* Product card */
+.prod-card{background:var(--surf);border:1px solid var(--outline-var);border-radius:var(--radius);padding:14px;transition:all .15s}
+.prod-card:active{background:var(--surf-high)}
+.prod-card .header{display:flex;justify-content:space-between;align-items:flex-start}
+.prod-card .sku{font-family:var(--mono);font-size:12px;color:var(--primary-dim)}
+.prod-card .name{font-size:15px;font-weight:600;margin:2px 0 8px}
+.prod-card .meta{display:flex;gap:14px;font-size:11px;margin-top:8px}
+.prod-card .price{font-size:20px;font-weight:600;color:var(--primary-dim)}
+/* Customer chip */
+.cust-chip{border:1px solid var(--outline-var);border-radius:var(--radius);padding:18px 12px;text-align:center;transition:all .15s;flex:1}
+.cust-chip.selected{border-color:var(--primary-dim);border-width:2px;background:var(--surf-high)}
+.cust-chip .material-symbols-outlined{font-size:28px;margin-bottom:6px}
+.cust-chip .label{font-size:11px;font-weight:700;letter-spacing:0.5px}
+/* Settings item */
+.settings-item{display:flex;align-items:center;padding:14px 16px;background:var(--surf);border:1px solid var(--outline-var);border-radius:var(--radius);gap:14px;margin-bottom:8px}
+.settings-item:active{background:var(--surf-high)}
+.settings-item .title{font-size:15px;font-weight:500}
+.settings-item .sub{font-size:11px;font-weight:700;letter-spacing:0.5px;color:var(--txt-var);text-transform:uppercase}
+/* Barcode scanner */
+#scanner-view{position:fixed;inset:0;z-index:150;background:#000;display:none}
+#scanner-view.show{display:flex;flex-direction:column}
+#scanner-view video{flex:1;object-fit:cover}
+#scanner-view .close-btn{position:absolute;top:16px;right:16px;z-index:2;background:rgba(0,0,0,.6);color:#fff;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+#scanner-view .scan-area{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:250px;height:250px;border:2px solid var(--primary-dim);border-radius:16px}
+.order-row{display:flex;justify-content:space-between;align-items:center;padding:14px;background:var(--surf);border:1px solid var(--outline-var);border-radius:var(--radius);margin-bottom:8px}
+.customer-header{border-left:4px solid var(--primary-container);padding:12px 14px;background:var(--surf-low);border-radius:var(--radius)}
+.skeleton{background:linear-gradient(90deg,var(--surf-high) 25%,var(--surf-highest) 50%,var(--surf-high) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--radius)}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:300;align-items:center;justify-content:center}
+.loading-overlay.show{display:flex}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- LOGIN SCREEN -->
+  <div id="screen-login" class="screen active">
+    <div class="login-bg">
+      <div class="login-card">
+        <div class="logo"><span class="material-symbols-outlined" style="font-variation-settings:'FILL'1">warehouse</span></div>
+        <h1 id="auth-title">MINEAZY</h1>
+        <p class="text-muted" style="font-size:11px;font-weight:700;letter-spacing:0.6px;margin:4px 0 32px" id="auth-subtitle">Industrial Sales Assistant</p>
+        <div style="display:flex;flex-direction:column;gap:14px;text-align:left">
+          <input id="login-user" type="text" placeholder="Username" autocomplete="username"/>
+          <input id="login-pass" type="password" placeholder="Password" autocomplete="current-password"/>
+          <button class="btn btn-primary" onclick="doAuth()" style="margin-top:8px" id="auth-submit-btn">SIGN IN</button>
+          <p id="login-error" class="text-red" style="font-size:12px;text-align:center;display:none"></p>
+        </div>
+        <p class="text-muted mono-sm" style="margin-top:20px;opacity:.5" id="auth-toggle-text">Don't have an account? <span style="color:var(--primary-dim);font-weight:700;cursor:pointer" onclick="toggleAuthMode()">Sign Up</span></p>
+        <p class="text-muted mono-sm" style="margin-top:16px;opacity:.3">v1.0.0 · Industrial License</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD SCREEN -->
+  <div id="screen-dashboard" class="screen">
+    <div class="topbar">
+      <h1>MINEAZY</h1>
+      <div class="actions">
+        <button onclick="openScanner()" style="color:var(--primary-dim)"><span class="material-symbols-outlined">qr_code_scanner</span></button>
+      </div>
+    </div>
+    <div class="p-gutter" style="display:flex;flex-direction:column;gap:14px">
+      <div class="card" style="background:var(--surf-low);display:flex;align-items:center;gap:14px">
+        <div style="width:52px;height:52px;border-radius:50%;background:var(--surf-high);border:2px solid var(--primary-dim);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">
+          <img id="dash-profile-pic" style="width:100%;height:100%;object-fit:cover;display:none" alt="Profile"/>
+          <span class="material-symbols-outlined" id="dash-profile-icon" style="font-size:28px;color:var(--txt-var)">person</span>
+        </div>
+        <div>
+          <div style="font-size:18px;font-weight:600" id="dash-rep-name">Alex Miller</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:2px">
+            <span class="text-muted" style="font-size:11px;font-weight:700;letter-spacing:0.5px">Industrial Sales Pro</span>
+            <span style="color:var(--outline)">·</span>
+            <span class="mono-sm text-primary" id="dash-rep-id">ID: 99283</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="showCreateOrderModal()"><span class="material-symbols-outlined" style="font-size:20px">add_circle</span>CREATE AN ORDER</button>
+      <div class="grid-2">
+        <div class="stat-card"><span class="label">Today's Orders</span><span class="value" id="stat-today">12</span></div>
+        <div class="stat-card"><span class="label">Total Sales</span><span class="value" id="stat-sales">$4,250</span></div>
+        <div class="stat-card"><span class="label">Orders Submitted</span><span class="value" id="stat-submitted">10</span></div>
+        <div class="stat-card pulse-card pulse"><span class="label">Pending Sync</span><span class="value" id="stat-pending">2</span></div>
+      </div>
+      <div>
+        <div class="flex justify-between items-center mb-4" style="margin-bottom:12px">
+          <span style="font-size:18px;font-weight:600">Recent Activity</span>
+          <button class="text-primary" style="font-size:11px;font-weight:700;letter-spacing:0.5px" onclick="navigate('orders')">VIEW ALL</button>
+        </div>
+        <div id="recent-orders"><p class="text-muted text-center" style="padding:20px">Loading...</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCT SEARCH SCREEN -->
+  <div id="screen-search" class="screen">
+    <div class="topbar">
+      <h1>Search Products</h1>
+      <div class="actions">
+        <button onclick="openScanner()" style="color:var(--primary-dim)"><span class="material-symbols-outlined">qr_code_scanner</span></button>
+      </div>
+    </div>
+    <div class="p-gutter">
+      <div style="display:flex;align-items:center;background:var(--surf-low);border:1px solid var(--outline-var);border-radius:var(--radius);padding:0 12px;margin-bottom:10px" id="search-box">
+        <span class="material-symbols-outlined text-muted" style="font-size:20px">search</span>
+        <input id="search-input" type="text" placeholder="Search by name, SKU, or part number..." style="border:none;background:transparent;flex:1;font-size:15px;padding:12px 10px" oninput="searchProducts(this.value)"/>
+        <button id="search-clear" style="display:none;padding:4px" onclick="document.getElementById('search-input').value='';searchProducts('')"><span class="material-symbols-outlined text-muted" style="font-size:18px">close</span></button>
+      </div>
+      <div id="cart-badge-search" style="display:none;padding:10px 14px;margin-bottom:10px;background:rgba(255,193,7,.08);border:1px solid rgba(250,189,0,.3);border-radius:var(--radius);font-size:11px;font-weight:700;letter-spacing:0.5px;color:var(--primary-dim)"></div>
+      <div id="category-tabs" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px;scrollbar-width:none;-ms-overflow-style:none">
+        <button class="cat-tab active" onclick="filterByCategory('all',this)" style="white-space:nowrap;padding:6px 14px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:0.5px;border:1px solid var(--outline-var);background:transparent;color:var(--txt-var)">All</button>
+      </div>
+      <div id="search-results"></div>
+    </div>
+  </div>
+
+  <!-- PRODUCT DETAIL MODAL -->
+  <div id="modal-product" class="modal-overlay">
+    <div class="modal">
+      <div class="flex justify-between items-center" style="margin-bottom:16px">
+        <span class="mono text-primary" id="pd-sku"></span>
+        <button onclick="closeModal('modal-product')"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div style="width:100%;height:160px;background:var(--surf-highest);border-radius:var(--radius);border:1px solid var(--outline-var);display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+        <span class="material-symbols-outlined" style="font-size:56px;opacity:.2">inventory_2</span>
+      </div>
+      <div class="flex justify-between items-start" style="margin-bottom:8px">
+        <h3 id="pd-name" style="margin:0;font-size:20px;color:var(--txt);text-transform:none"></h3>
+        <span id="pd-status"></span>
+      </div>
+      <div id="pd-location" class="mono-sm text-muted" style="margin-bottom:12px"></div>
+      <div class="card" style="background:var(--surf-low);margin-bottom:14px">
+        <div class="flex justify-between" style="font-size:12px;margin-bottom:6px"><span class="text-muted">Location</span><span id="pd-loc" class="mono-sm">-</span></div>
+        <div class="flex justify-between" style="font-size:12px;margin-bottom:6px"><span class="text-muted">Aisle / Shelf / Bin</span><span id="pd-aisle" class="mono-sm">-</span></div>
+        <div class="flex justify-between" style="font-size:12px;margin-bottom:6px"><span class="text-muted">Unit</span><span id="pd-unit" class="mono-sm">EA</span></div>
+        <div class="flex justify-between" style="font-size:12px"><span class="text-muted">Part #</span><span id="pd-part" class="mono-sm">-</span></div>
+      </div>
+      <div style="font-size:28px;font-weight:700;color:var(--primary-dim);margin-bottom:4px" id="pd-price"></div>
+      <div class="text-muted mono-sm" id="pd-price-excl" style="margin-bottom:2px"></div>
+      <div class="text-muted" id="pd-stock" style="font-size:12px;margin-bottom:16px"></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <span style="font-size:12px;font-weight:700;letter-spacing:0.5px;color:var(--txt-var)">QTY</span>
+        <div class="qty-ctrl">
+          <button onclick="changeQty(-1)">−</button>
+          <span class="qty" id="pd-qty">1</span>
+          <button onclick="changeQty(1)">+</button>
+        </div>
+        <span class="mono-sm text-muted" id="pd-max-qty"></span>
+      </div>
+      <button class="btn btn-primary w-full" id="pd-add-btn" onclick="addToCartFromDetail()"><span class="material-symbols-outlined" style="font-size:18px">add_shopping_cart</span>Add to Cart</button>
+    </div>
+  </div>
+
+  <!-- CART SCREEN -->
+  <div id="screen-cart" class="screen">
+    <div class="topbar">
+      <h1>Cart</h1>
+      <div class="actions">
+        <button id="cart-clear-btn" style="color:var(--red);display:none" onclick="clearCart()"><span class="material-symbols-outlined">delete_outline</span></button>
+      </div>
+    </div>
+    <div class="p-gutter" id="cart-content"></div>
+  </div>
+
+  <!-- PICKING MODAL -->
+  <div id="modal-picking" class="modal-overlay">
+    <div class="modal" style="max-width:440px">
+      <div class="flex justify-between items-center" style="margin-bottom:12px">
+        <h3 style="margin:0">Picking Mode</h3>
+        <button onclick="closeModal('modal-picking')"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="flex justify-between items-center mb-4" style="font-size:12px;font-weight:700;letter-spacing:0.5px;margin-bottom:10px">
+        <span class="text-primary">Order Progress</span>
+        <span class="mono text-primary" id="picking-count"></span>
+      </div>
+      <div class="progress-bar" style="margin-bottom:16px"><div class="fill" id="picking-progress-bar" style="width:0%"></div></div>
+      <div id="picking-items" style="max-height:50vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px"></div>
+      <button class="btn btn-primary w-full mt-4" id="picking-complete-btn" onclick="completePicking()" disabled><span class="material-symbols-outlined" style="font-size:18px">assignment_turned_in</span>Complete Collection</button>
+    </div>
+  </div>
+
+  <!-- CART SUMMARY / ERP SUBMIT MODAL -->
+  <div id="modal-summary" class="modal-overlay">
+    <div class="modal" style="max-width:440px">
+      <div class="flex justify-between items-center" style="margin-bottom:16px">
+        <h3 style="margin:0">Cart Summary</h3>
+        <button onclick="closeModal('modal-summary')"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div id="summary-customer" class="customer-header" style="margin-bottom:14px"></div>
+      <div class="section-title" style="margin-bottom:8px">LINE ITEMS</div>
+      <div id="summary-items" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
+      <div class="card" style="background:var(--surf-high);margin-bottom:16px">
+        <div class="flex justify-between" style="margin-bottom:6px"><span class="text-muted">Subtotal</span><span class="mono" id="sum-subtotal"></span></div>
+        <div class="flex justify-between" style="margin-bottom:6px"><span class="text-muted">Tax (15%)</span><span class="mono" id="sum-tax"></span></div>
+        <div style="border-top:1px solid var(--outline-var);margin:10px 0;padding-top:10px" class="flex justify-between"><span style="font-size:16px;font-weight:600">Grand Total</span><span style="font-size:24px;font-weight:700;color:var(--primary-container)" id="sum-total"></span></div>
+      </div>
+      <div id="summary-status" style="display:none;text-align:center;padding:8px;font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--txt-var)">Syncing to ERP...</div>
+      <button class="btn btn-primary w-full" id="summary-submit-btn" onclick="submitOrder()"><span class="material-symbols-outlined">description</span>GENERATE SALES ORDER</button>
+    </div>
+  </div>
+
+  <!-- CREATE ORDER MODAL -->
+  <div id="modal-create-order" class="modal-overlay">
+    <div class="modal">
+      <h3>New Order</h3>
+      <div class="section-title" style="margin-bottom:10px">CUSTOMER</div>
+      <div class="flex gap-8" style="margin-bottom:14px">
+        <div class="cust-chip selected" id="chip-walkin" onclick="selectCustomerType('walkin')">
+          <span class="material-symbols-outlined">directions_walk</span>
+          <div class="label">Walk-In</div>
+        </div>
+        <div class="cust-chip" id="chip-existing" onclick="selectCustomerType('existing')">
+          <span class="material-symbols-outlined">person</span>
+          <div class="label">Existing</div>
+        </div>
+      </div>
+      <div id="customer-search-box" style="display:none;margin-bottom:14px">
+        <input id="customer-search-input" type="text" placeholder="Search customer name..." oninput="searchCustomers(this.value)"/>
+        <div id="customer-search-results" style="max-height:150px;overflow-y:auto;margin-top:4px"></div>
+      </div>
+      <div id="walkin-name-box" style="margin-bottom:14px">
+        <input id="walkin-name-input" type="text" placeholder="Customer name (optional)"/>
+      </div>
+      <div class="flex gap-8">
+        <button class="btn btn-ghost" onclick="closeModal('modal-create-order')">CANCEL</button>
+        <button class="btn btn-primary" onclick="startOrder()">START ORDER</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS MODAL -->
+  <div id="modal-success" class="modal-overlay">
+    <div class="modal" style="text-align:center">
+      <div style="width:80px;height:80px;border-radius:50%;background:var(--green-bg);border:3px solid var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+        <span class="material-symbols-outlined" style="font-size:44px;color:var(--green)">check</span>
+      </div>
+      <h3 style="color:var(--txt);text-transform:none">Sales Order Created</h3>
+      <div id="success-order-num" style="font-size:32px;font-weight:700;color:var(--primary-dim);margin:8px 0"></div>
+      <div id="success-erp-ref" class="mono-sm text-muted" style="margin-bottom:12px"></div>
+      <div class="text-muted" id="success-details" style="margin-bottom:20px"></div>
+      <button class="btn btn-success w-full" onclick="closeModal('modal-success');navigate('dashboard')">Done</button>
+    </div>
+  </div>
+
+  <!-- SETTINGS SCREEN -->
+  <div id="screen-settings" class="screen">
+    <div class="topbar"><h1>Settings</h1><div></div></div>
+    <div class="p-gutter" style="display:flex;flex-direction:column;gap:14px">
+      <div class="card" style="background:var(--surf-low);text-align:center;padding:24px">
+        <div onclick="document.getElementById('profile-pic-input').click()" style="width:72px;height:72px;border-radius:50%;background:var(--surf-high);border:2px solid var(--primary-dim);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;cursor:pointer;overflow:hidden;position:relative">
+          <img id="set-profile-pic" style="width:100%;height:100%;object-fit:cover;display:none" alt="Profile"/>
+          <span class="material-symbols-outlined" id="set-profile-icon" style="font-size:36px;color:var(--txt-var)">person</span>
+        </div>
+        <input type="file" id="profile-pic-input" accept="image/*" style="display:none" onchange="handleProfilePicUpload(event)"/>
+        <div style="font-size:18px;font-weight:600" id="set-rep-name"></div>
+        <div class="mono-sm text-muted" id="set-rep-id" style="margin-top:4px"></div>
+      </div>
+      <div class="section-title">PERSONAL PREFERENCES</div>
+      <div class="settings-item" onclick="openEditProfile()"><span class="material-symbols-outlined text-primary">person</span><div class="flex flex-col" style="flex:1"><span class="title">Edit Profile</span><span class="sub" id="set-display-name-sub">Tap to change name</span></div><span class="material-symbols-outlined text-muted">chevron_right</span></div>
+      <div class="settings-item" onclick="toggleTheme()"><span class="material-symbols-outlined text-primary" id="theme-icon">dark_mode</span><div class="flex flex-col" style="flex:1"><span class="title">Theme</span><span class="sub" id="theme-label">DARK MODE</span></div><span class="material-symbols-outlined text-muted">chevron_right</span></div>
+      <div class="settings-item" onclick="toggleLanguage()"><span class="material-symbols-outlined text-primary">language</span><div class="flex flex-col" style="flex:1"><span class="title">Language</span><span class="sub" id="lang-label">ENGLISH (US)</span></div><span class="material-symbols-outlined text-muted">chevron_right</span></div>
+      <div class="settings-item" onclick="toggleNotifications()"><span class="material-symbols-outlined text-primary" id="notif-icon">notifications</span><div class="flex flex-col" style="flex:1"><span class="title">Notifications</span><span class="sub" id="notif-label">ENABLED</span></div><span class="material-symbols-outlined text-muted">chevron_right</span></div>
+      <div class="section-title mt-4" style="margin-top:10px">SYSTEM UTILITIES</div>
+      <div class="card" style="padding:16px" onclick="toggleScannerSensitivity()">
+        <div class="flex justify-between items-center" style="margin-bottom:8px">
+          <div class="flex items-center gap-8"><span class="material-symbols-outlined text-primary">qr_code_scanner</span><span>Barcode Scanner</span></div>
+          <span class="badge badge-yellow" id="scanner-sensitivity-badge">HIGH SENSITIVITY</span>
+        </div>
+        <div class="progress-bar"><div class="fill" id="scanner-sensitivity-bar" style="width:80%"></div></div>
+        <div class="mono-sm text-muted" style="text-align:right;margin-top:4px;font-size:10px" id="scanner-sensitivity-label">Tap to change</div>
+      </div>
+      <div class="grid-2">
+        <div class="card" style="padding:16px" onclick="openCustomerManagement()"><span class="material-symbols-outlined text-primary" style="font-size:28px;margin-bottom:10px">group</span><div style="font-size:13px;font-weight:600">Customers</div><div class="mono-sm text-muted" style="font-size:10px">Manage</div></div>
+        <div class="card" style="padding:16px" onclick="triggerSyncNow()"><span class="material-symbols-outlined text-primary" style="font-size:28px;margin-bottom:10px">sync</span><div style="font-size:13px;font-weight:600">Offline Sync</div><div class="mono-sm text-muted" style="font-size:10px">Every 15 mins</div></div>
+        <div class="card" style="padding:16px" onclick="toggleERPTest()"><span class="material-symbols-outlined" id="erp-status-icon" style="font-size:28px;margin-bottom:10px;color:var(--green)">hub</span><div style="font-size:13px;font-weight:600">ERP</div><div class="mono-sm" style="font-size:10px;color:var(--green)" id="erp-status-label">Online</div></div>
+      </div>
+      <button class="btn btn-danger w-full mt-4" onclick="doLogout()" style="margin-bottom:8px"><span class="material-symbols-outlined">logout</span>LOGOUT</button>
+      <div class="text-center" style="opacity:.25;padding:12px">
+        <div class="mono-sm">Mineazy Sales Pro v1.0.0</div>
+        <div class="mono-sm">Industrial License #882-X90</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOMER MANAGEMENT MODAL -->
+  <div id="modal-customers" class="modal-overlay">
+    <div class="modal" style="max-width:440px">
+      <div class="flex justify-between items-center" style="margin-bottom:16px">
+        <h3 style="margin:0">Customers</h3>
+        <button onclick="closeModal('modal-customers')"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <input id="cust-search-input" type="text" placeholder="Search customers..." oninput="searchManageCustomers(this.value)" style="flex:1"/>
+        <button class="btn btn-primary" style="width:auto;padding:12px 16px" onclick="showAddCustomerForm()"><span class="material-symbols-outlined" style="font-size:18px">add</span></button>
+      </div>
+      <div id="manage-customer-list" style="max-height:50vh;overflow-y:auto"></div>
+      <div id="customer-form" style="display:none;margin-top:12px">
+        <input id="cust-form-id" type="hidden"/>
+        <input id="cust-form-name" type="text" placeholder="Customer name *" style="margin-bottom:8px"/>
+        <input id="cust-form-company" type="text" placeholder="Company" style="margin-bottom:8px"/>
+        <input id="cust-form-phone" type="text" placeholder="Phone" style="margin-bottom:8px"/>
+        <input id="cust-form-email" type="email" placeholder="Email" style="margin-bottom:12px"/>
+        <div class="flex gap-8">
+          <button class="btn btn-ghost" onclick="cancelCustomerForm()">CANCEL</button>
+          <button class="btn btn-primary" onclick="saveCustomer()">SAVE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT PROFILE MODAL -->
+  <div id="modal-edit-profile" class="modal-overlay">
+    <div class="modal">
+      <div class="flex justify-between items-center" style="margin-bottom:16px">
+        <h3 style="margin:0">Edit Profile</h3>
+        <button onclick="closeModal('modal-edit-profile')"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div style="text-align:center;margin-bottom:16px">
+        <div onclick="document.getElementById('edit-pic-input').click()" style="width:80px;height:80px;border-radius:50%;background:var(--surf-high);border:2px solid var(--primary-dim);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative">
+          <img id="edit-preview-pic" style="width:100%;height:100%;object-fit:cover;display:none" alt="Preview"/>
+          <span class="material-symbols-outlined" id="edit-preview-icon" style="font-size:40px;color:var(--txt-var)">person</span>
+        </div>
+        <input type="file" id="edit-pic-input" accept="image/*" style="display:none" onchange="handleEditPicPreview(event)"/>
+        <div class="text-primary" style="font-size:11px;font-weight:700;letter-spacing:0.5px;margin-top:8px">Tap image to change photo</div>
+      </div>
+      <div style="margin-bottom:14px">
+        <label class="section-title" style="margin-bottom:6px;display:block">Display Name</label>
+        <input id="edit-profile-name" type="text" placeholder="Enter your display name"/>
+      </div>
+      <div style="margin-bottom:14px">
+        <label class="section-title" style="margin-bottom:6px;display:block">Role / Title</label>
+        <input id="edit-profile-role" type="text" placeholder="e.g. Industrial Sales Pro"/>
+      </div>
+      <div class="flex gap-8">
+        <button class="btn btn-ghost" onclick="closeModal('modal-edit-profile')">CANCEL</button>
+        <button class="btn btn-primary" onclick="saveProfile()">SAVE CHANGES</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCANNER OVERLAY -->
+  <div id="scanner-view">
+    <button class="close-btn" onclick="closeScanner()"><span class="material-symbols-outlined">close</span></button>
+    <div class="scan-area"></div>
+    <div style="padding:20px;text-align:center;background:rgba(0,0,0,.8)">
+      <p style="font-size:16px;font-weight:600;margin-bottom:4px" id="scan-title">Scan Barcode</p>
+      <p class="text-muted" style="font-size:12px" id="scan-subtitle">Point camera at product barcode</p>
+      <div id="pick-scan-info" style="display:none;margin-top:6px">
+        <span class="badge badge-green" style="font-size:12px;padding:4px 12px">PICKING VERIFICATION</span>
+      </div>
+      <input id="manual-barcode" type="text" placeholder="Or enter barcode manually..." style="margin-top:12px;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15);color:#fff" onkeydown="if(event.key==='Enter')scanManualBarcode()"/>
+      <button class="btn btn-primary" style="margin-top:10px" onclick="scanManualBarcode()">Lookup Barcode</button>
+    </div>
+  </div>
+
+  <!-- ORDERS SCREEN -->
+  <div id="screen-orders" class="screen">
+    <div class="topbar">
+      <h1>Orders</h1>
+      <div class="actions">
+        <button onclick="exportOrdersCSV()" style="color:var(--primary-dim)" title="Export CSV"><span class="material-symbols-outlined">download</span></button>
+      </div>
+    </div>
+    <div class="p-gutter">
+      <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto" id="orders-filter-chips">
+        <button class="cat-tab active" onclick="filterOrders('all',this)">All</button>
+        <button class="cat-tab" onclick="filterOrders('confirmed',this)">Confirmed</button>
+        <button class="cat-tab" onclick="filterOrders('queued',this)">Queued</button>
+      </div>
+      <div id="orders-list"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <div class="loading-overlay" id="loading-overlay"><div class="spinner" style="width:40px;height:40px;border-width:3px"></div></div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <a href="#" data-screen="dashboard" class="active" onclick="navigate('dashboard')"><span class="material-symbols-outlined" style="font-variation-settings:'FILL'1">dashboard</span>Home</a>
+    <a href="#" data-screen="search" onclick="navigate('search')"><span class="material-symbols-outlined">search</span>Search</a>
+    <a href="#" data-screen="orders" onclick="navigate('orders')"><span class="material-symbols-outlined">receipt_long</span>Orders</a>
+    <a href="#" data-screen="cart" onclick="navigate('cart')"><span class="material-symbols-outlined">shopping_cart</span>Cart</a>
+    <a href="#" data-screen="settings" onclick="navigate('settings')"><span class="material-symbols-outlined">settings</span>Settings</a>
+  </nav>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
