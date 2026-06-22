@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = 3000;
-const ROOT = 'C:\\Users\\xxass\\mineazy_pwa';
+const ROOT = path.join(__dirname, 'www');
 
 const mimeTypes = {
   '.html': 'text/html',

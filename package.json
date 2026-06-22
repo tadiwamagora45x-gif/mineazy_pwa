@@ -1,0 +1,28 @@
+{
+  "name": "mineazy_pwa",
+  "version": "1.0.0",
+  "description": "A Progressive Web App for industrial sales representatives.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node server.js",
+    "sync": "npx cap sync android",
+    "open": "npx cap open android"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tadiwamagora45x-gif/mineazy_pwa.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/tadiwamagora45x-gif/mineazy_pwa/issues"
+  },
+  "homepage": "https://github.com/tadiwamagora45x-gif/mineazy_pwa#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.4.1",
+    "@capacitor/cli": "^8.4.1",
+    "@capacitor/core": "^8.4.1"
+  }
+}
