@@ -7,9 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="theme-color" content="#131313"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
-<title>Mineazy Sales Assistant</title>
+<title>Mineazy Mobile POS</title>
 <link rel="manifest" href="manifest.json"/>
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%23FABD00'/><text x='96' y='130' text-anchor='middle' font-size='100' font-weight='bold' fill='%23261A00'>M</text></svg>"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <style>:root{--bg:#131313;--surf-dim:#131313;--surf:#201f1f;--surf-low:#1c1b1b;--surf-high:#2a2a2a;--surf-highest:#353534;--txt:#e5e2e1;--txt-var:#d4c5ab;--outline:#9c8f78;--outline-var:#4f4632;--primary:#ffe4af;--primary-dim:#fabd00;--primary-container:#ffc107;--on-primary-container:#6d5100;--on-primary-fixed:#261a00;--secondary:#ffbf81;--secondary-container:#ff9800;--on-secondary-container:#653900;--tertiary:#d9e8ff;--error:#ffb4ab;--error-container:#93000a;--on-error:#690005;--green:#4caf50;--green-bg:rgba(76,175,80,0.2);--orange:#ff9800;--orange-bg:rgba(255,152,0,0.2);--red:#ff5252;--red-bg:rgba(255,82,82,0.15);--touch:48px;--gutter:16px;--radius:4px;--radius-lg:8px;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
@@ -144,8 +144,8 @@ input:focus{border-color:var(--primary);border-width:2px}
     <div class="login-bg">
       <div class="login-card">
         <div class="logo"><span class="material-symbols-outlined" style="font-variation-settings:'FILL'1">warehouse</span></div>
-        <h1 id="auth-title">MINEAZY</h1>
-        <p class="text-muted" style="font-size:11px;font-weight:700;letter-spacing:0.6px;margin:4px 0 32px" id="auth-subtitle">Industrial Sales Assistant</p>
+        <h1 id="auth-title">Mineazy Mobile POS</h1>
+        <p class="text-muted" style="font-size:11px;font-weight:700;letter-spacing:0.6px;margin:4px 0 32px" id="auth-subtitle">Mobile Point of Sale</p>
         <div style="display:flex;flex-direction:column;gap:14px;text-align:left">
           <input id="login-user" type="text" placeholder="Username" autocomplete="username"/>
           <input id="login-pass" type="password" placeholder="Password" autocomplete="current-password"/>
@@ -161,7 +161,7 @@ input:focus{border-color:var(--primary);border-width:2px}
   <!-- DASHBOARD SCREEN -->
   <div id="screen-dashboard" class="screen">
     <div class="topbar">
-      <h1>MINEAZY</h1>
+      <h1>Mineazy Mobile POS</h1>
       <div class="actions">
         <button onclick="openScanner()" style="color:var(--primary-dim)"><span class="material-symbols-outlined">qr_code_scanner</span></button>
       </div>
@@ -382,7 +382,7 @@ input:focus{border-color:var(--primary);border-width:2px}
       </div>
       <button class="btn btn-danger w-full mt-4" onclick="doLogout()" style="margin-bottom:8px"><span class="material-symbols-outlined">logout</span>LOGOUT</button>
       <div class="text-center" style="opacity:.25;padding:12px">
-        <div class="mono-sm">Mineazy Sales Pro v1.0.0</div>
+        <div class="mono-sm">Mineazy Mobile POS v1.0.0</div>
         <div class="mono-sm">Industrial License #882-X90</div>
       </div>
     </div>

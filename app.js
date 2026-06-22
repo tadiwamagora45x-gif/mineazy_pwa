@@ -1,5 +1,5 @@
 // ============================================================
-// MINEAZY Sales Assistant - App Logic
+// MINEAZY Mobile POS - App Logic
 // Progressive Web App for Industrial Sales
 // ============================================================
 
@@ -233,8 +233,8 @@ let authMode = 'login';
 
 function toggleAuthMode() {
   authMode = authMode === 'login' ? 'signup' : 'login';
-  document.getElementById('auth-title').textContent = authMode === 'login' ? 'MINEAZY' : 'Create Account';
-  document.getElementById('auth-subtitle').textContent = authMode === 'login' ? 'Industrial Sales Assistant' : 'Sign up to get started';
+  document.getElementById('auth-title').textContent = authMode === 'login' ? 'Mineazy Mobile POS' : 'Create Account';
+  document.getElementById('auth-subtitle').textContent = authMode === 'login' ? 'Mobile Point of Sale' : 'Sign up to get started';
   document.getElementById('auth-submit-btn').textContent = authMode === 'login' ? 'SIGN IN' : 'SIGN UP';
   document.getElementById('auth-toggle-text').innerHTML = authMode === 'login'
     ? 'Don\'t have an account? <span style="color:var(--primary-dim);font-weight:700;cursor:pointer" onclick="toggleAuthMode()">Sign Up</span>'

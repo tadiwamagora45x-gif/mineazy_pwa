@@ -31,5 +31,5 @@ http.createServer((req, res) => {
     res.end(data);
   });
 }).listen(PORT, () => {
-  console.log('Mineazy PWA running at http://localhost:' + PORT);
+  console.log('Mineazy Mobile POS running at http://localhost:' + PORT);
 });

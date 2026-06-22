@@ -1,6 +1,6 @@
 {
-  "name": "Mineazy Sales Assistant",
-  "short_name": "Mineazy",
+  "name": "Mineazy Mobile POS",
+  "short_name": "Mineazy POS",
   "description": "Industrial Sales Assistant for warehouse and shop-floor sales reps.",
   "start_url": "/",
   "display": "standalone",
@@ -9,14 +9,14 @@
   "theme_color": "#131313",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%23FABD00'/><text x='96' y='130' text-anchor='middle' font-size='100' font-weight='bold' fill='%23261A00'>M</text></svg>",
+      "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/png"
     },
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='64' fill='%23FABD00'/><text x='256' y='350' text-anchor='middle' font-size='280' font-weight='bold' fill='%23261A00'>M</text></svg>",
+      "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/png"
     }
   ],
   "categories": ["business", "productivity", "utilities"],
