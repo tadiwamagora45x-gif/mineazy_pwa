@@ -110,6 +110,16 @@ function dbClear(storeName) {
   });
 }
 
+function dbPutAll(storeName, items) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(storeName, 'readwrite');
+    const store = tx.objectStore(storeName);
+    for (const item of items) store.put(item);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
 // ---- Seed Sample Data ----
 async function seedDemoProducts() {
   // Try loading real catalog from products.json
@@ -120,9 +130,7 @@ async function seedDemoProducts() {
       const existing = await dbGetAll('products');
       if (existing.length < catalog.length) {
         await dbClear('products');
-        for (const p of catalog) {
-          await dbPut('products', p);
-        }
+        await dbPutAll('products', catalog);
         console.log('Loaded ' + catalog.length + ' products from catalog');
       }
       return;
@@ -150,9 +158,7 @@ async function seedDemoProducts() {
     { id: 'p14', sku: 'SAW-HAND-PRO', name: 'Professional Handsaw', description: '24 inch industrial handsaw', price: 29.99, priceExcl: 25.97, stockQuantity: 30, unitOfMeasure: 'EA', shelfLocation: '2A', binNumber: 'SHELF-02', aisleNumber: '2', barcode: '7316574456780', category: 'Tools', partNumber: 'HS-24' },
     { id: 'p15', sku: 'OIL-20W50-5L', name: 'Engine Oil 20W50 5L', description: 'Heavy duty engine oil 5 liters', price: 42.00, priceExcl: 36.36, stockQuantity: 65, unitOfMeasure: 'EA', shelfLocation: '10A', binNumber: 'RACK-O01', aisleNumber: '10', barcode: '7316575567891', category: 'Lubricants', partNumber: '20W50-5L' },
   ];
-  for (const p of products) {
-    await dbPut('products', p);
-  }
+  await dbPutAll('products', products);
 }
 
 // ---- Demo Customers ----
@@ -165,9 +171,7 @@ async function seedDemoCustomers() {
     { id: 'c3', name: 'Global Mining Corp', company: 'GMC Ltd.', phone: '+260955789012', email: 'procurement@gmc.com', orderCount: 34, lastOrderDate: '2026-06-14' },
     { id: 'c4', name: 'Copperbelt Hardware', company: 'CB Hardware', phone: '+260944321098', email: 'sales@cbhw.com', orderCount: 18, lastOrderDate: '2026-06-12' },
   ];
-  for (const c of customers) {
-    await dbPut('customers', c);
-  }
+  await dbPutAll('customers', customers);
 }
 
 // ---- Navigation ----
@@ -491,8 +495,12 @@ async function searchProducts(query) {
     if (filtered.length === 0) {
       results.innerHTML = '<div class="empty-state"><span class="material-symbols-outlined icon">inventory_2</span><p>No products in this category</p></div>';
     } else {
-      results.innerHTML = '<div class="text-muted" style="text-align:center;padding:16px;font-size:12px;font-weight:600">' + filtered.length + ' products</div>';
-      results.innerHTML += filtered.map(p => renderProductCard(p)).join('');
+      const show = filtered.slice(0, 50);
+      results.innerHTML = '<div class="text-muted" style="text-align:center;padding:16px;font-size:12px;font-weight:600">' + filtered.length + ' products · showing first 50</div>';
+      results.innerHTML += show.map(p => renderProductCard(p)).join('');
+      if (filtered.length > 50) {
+        results.innerHTML += '<div class="text-muted" style="text-align:center;padding:12px;font-size:11px">Type a keyword to search all ' + filtered.length + ' products</div>';
+      }
     }
     return;
   }
