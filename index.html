@@ -368,6 +368,10 @@ input:focus{border-color:var(--primary);border-width:2px}
       <div class="settings-item" onclick="toggleNotifications()"><span class="material-symbols-outlined text-primary" id="notif-icon">notifications</span><div class="flex flex-col" style="flex:1"><span class="title">Notifications</span><span class="sub" id="notif-label">ENABLED</span></div><span class="material-symbols-outlined text-muted">chevron_right</span></div>
       <div class="section-title mt-4" style="margin-top:10px">ERP SYNC</div>
       <div class="card" style="padding:16px;background:var(--surf-low)">
+        <div style="display:flex;gap:6px;margin-bottom:10px">
+          <input id="erp-url-input" type="text" placeholder="ERP URL (e.g. http://192.168.0.164:3001)" style="font-size:11px;padding:8px 10px;flex:1"/>
+          <button class="btn btn-primary" style="width:auto;padding:8px 12px;font-size:11px" onclick="saveERPUrl()">Save</button>
+        </div>
         <div class="flex items-center gap-10" style="margin-bottom:12px">
           <div style="width:12px;height:12px;border-radius:50%;flex-shrink:0" id="erp-dot"></div>
           <div style="flex:1">

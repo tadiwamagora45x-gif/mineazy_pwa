@@ -15,7 +15,8 @@ const state = {
 };
 
 // ---- API Client ----
-const API_BASE = 'http://localhost:3001';
+const API_BASE = localStorage.getItem('erp_api_url') || 'http://192.168.0.164:3001';
+function setAPIBase(url) { localStorage.setItem('erp_api_url', url); location.reload(); }
 const DEVICE_ID = (() => {
   let id = localStorage.getItem('mineazy_device_id');
   if (!id) { id = 'dev_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); localStorage.setItem('mineazy_device_id', id); }
@@ -1298,9 +1299,16 @@ function renderSettings() {
   document.getElementById('scanner-sensitivity-badge-sm').textContent = sensLabels[sens] || 'HIGH';
 
   // ERP Sync status
+  document.getElementById('erp-url-input').value = API_BASE;
   renderERPSyncStatus();
-  // Run real ERP check async
   checkERPStatus();
+}
+
+function saveERPUrl() {
+  const url = document.getElementById('erp-url-input').value.trim();
+  if (!url) return toast('Enter a valid URL');
+  toast('ERP URL saved. Restarting...');
+  setTimeout(() => setAPIBase(url), 800);
 }
 
 // ---- Edit Profile ----
