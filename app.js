@@ -1294,23 +1294,13 @@ function renderSettings() {
 
   // Scanner sensitivity
   const sens = localStorage.getItem('mineazy_scanner_sens') || 'high';
-  const sensLabels = { low: 'LOW SENSITIVITY', medium: 'MEDIUM SENSITIVITY', high: 'HIGH SENSITIVITY' };
-  const sensWidths = { low: '30%', medium: '60%', high: '80%' };
-  document.getElementById('scanner-sensitivity-badge').textContent = sensLabels[sens] || 'HIGH SENSITIVITY';
-  document.getElementById('scanner-sensitivity-bar').style.width = sensWidths[sens] || '80%';
+  const sensLabels = { low: 'LOW', medium: 'MED', high: 'HIGH' };
+  document.getElementById('scanner-sensitivity-badge-sm').textContent = sensLabels[sens] || 'HIGH';
 
-  // ERP status
-  const statusIcon = document.getElementById('erp-status-icon');
-  const statusLabel = document.getElementById('erp-status-label');
-  if (navigator.onLine) {
-    statusIcon.style.color = 'var(--green)';
-    statusLabel.style.color = 'var(--green)';
-    statusLabel.textContent = 'Online';
-  } else {
-    statusIcon.style.color = 'var(--red)';
-    statusLabel.style.color = 'var(--red)';
-    statusLabel.textContent = 'Offline';
-  }
+  // ERP Sync status
+  renderERPSyncStatus();
+  // Run real ERP check async
+  checkERPStatus();
 }
 
 // ---- Edit Profile ----
@@ -1475,31 +1465,76 @@ function toggleScannerSensitivity() {
   toast('Scanner: ' + next.toUpperCase() + ' SENSITIVITY');
 }
 
-// ---- Trigger Sync ----
-function triggerSyncNow() {
-  syncPendingOrders();
-  toast('Sync triggered...');
+// ---- ERP Sync ----
+async function checkERPStatus() {
+  const dot = document.getElementById('erp-dot');
+  const text = document.getElementById('erp-status-text');
+  const detail = document.getElementById('erp-status-detail');
+  try {
+    const resp = await fetch(API_BASE + '/api/auth/csrf', { credentials: 'include' });
+    const ok = resp.ok;
+    dot.style.background = ok ? '#4caf50' : '#ff5252';
+    text.textContent = ok ? 'ERP Connected' : 'ERP Unreachable';
+    detail.textContent = ok ? API_BASE : 'Check your connection';
+  } catch (_) {
+    dot.style.background = '#ff5252';
+    text.textContent = 'ERP Offline';
+    detail.textContent = 'Cannot reach ' + API_BASE;
+  }
 }
 
-// ---- ERP Test ----
-function toggleERPTest() {
-  if (navigator.onLine) {
-    toast('ERP connection active - Online');
-  } else {
-    toast('ERP unreachable - Offline mode');
+function renderERPSyncStatus() {
+  const lastSync = localStorage.getItem('erp_last_sync');
+  document.getElementById('erp-last-sync').textContent = lastSync ? timeAgo(lastSync) : 'Never';
+  dbGetAll('sync').then(items => {
+    document.getElementById('erp-pending-count').textContent = items.length + ' items';
+  });
+  const dot = document.getElementById('erp-dot');
+  dot.style.background = '#ff9800';
+  document.getElementById('erp-status-text').textContent = 'Checking...';
+  document.getElementById('erp-status-detail').textContent = 'Connecting to ERP';
+}
+
+async function doManualSync() {
+  const btn = document.getElementById('erp-sync-btn');
+  const status = document.getElementById('erp-sync-status');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Syncing...';
+  status.style.display = 'block';
+  status.textContent = 'Connecting to ERP...';
+
+  try {
+    await syncPendingOrders();
+    const now = new Date().toISOString();
+    localStorage.setItem('erp_last_sync', now);
+    document.getElementById('erp-last-sync').textContent = timeAgo(now);
+    const items = await dbGetAll('sync');
+    document.getElementById('erp-pending-count').textContent = items.length + ' items';
+    status.textContent = 'Sync complete';
+    toast('Synced successfully');
+  } catch (e) {
+    status.textContent = 'Sync failed: ' + (e.message || 'Unknown error');
+    toast('Sync failed');
   }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px">sync</span>Sync Now';
+  setTimeout(() => { status.style.display = 'none'; }, 3000);
+  checkERPStatus();
 }
 
 // ---- Network Status ----
 window.addEventListener('online', () => {
   state.isOnline = true;
   syncPendingOrders();
-  if (state.currentScreen === 'settings') renderSettings();
+  if (state.currentScreen === 'settings') { renderSettings(); checkERPStatus(); }
+  toast('Back online - syncing...');
 });
 
 window.addEventListener('offline', () => {
   state.isOnline = false;
-  if (state.currentScreen === 'settings') renderSettings();
+  if (state.currentScreen === 'settings') { renderSettings(); checkERPStatus(); }
+  toast('You are offline');
 });
 
 async function syncPendingOrders() {
@@ -1513,9 +1548,12 @@ async function syncPendingOrders() {
       orders,
     });
     for (const item of items) await dbDelete('sync', item.id);
-    toast('Synced ' + orders.length + ' pending orders');
+    localStorage.setItem('erp_last_sync', new Date().toISOString());
+    toast('Synced ' + orders.length + ' orders to ERP');
     loadDashboard();
-  } catch (_) {}
+  } catch (_) {
+    throw new Error('ERP unreachable');
+  }
 }
 
 // ---- Init ----

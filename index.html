@@ -366,19 +366,31 @@ input:focus{border-color:var(--primary);border-width:2px}
       <div class="settings-item" onclick="toggleTheme()"><span class="material-symbols-outlined text-primary" id="theme-icon">dark_mode</span><div class="flex flex-col" style="flex:1"><span class="title">Theme</span><span class="sub" id="theme-label">DARK MODE</span></div><span class="material-symbols-outlined text-muted">chevron_right</span></div>
       <div class="settings-item" onclick="toggleLanguage()"><span class="material-symbols-outlined text-primary">language</span><div class="flex flex-col" style="flex:1"><span class="title">Language</span><span class="sub" id="lang-label">ENGLISH (US)</span></div><span class="material-symbols-outlined text-muted">chevron_right</span></div>
       <div class="settings-item" onclick="toggleNotifications()"><span class="material-symbols-outlined text-primary" id="notif-icon">notifications</span><div class="flex flex-col" style="flex:1"><span class="title">Notifications</span><span class="sub" id="notif-label">ENABLED</span></div><span class="material-symbols-outlined text-muted">chevron_right</span></div>
-      <div class="section-title mt-4" style="margin-top:10px">SYSTEM UTILITIES</div>
-      <div class="card" style="padding:16px" onclick="toggleScannerSensitivity()">
-        <div class="flex justify-between items-center" style="margin-bottom:8px">
-          <div class="flex items-center gap-8"><span class="material-symbols-outlined text-primary">qr_code_scanner</span><span>Barcode Scanner</span></div>
-          <span class="badge badge-yellow" id="scanner-sensitivity-badge">HIGH SENSITIVITY</span>
+      <div class="section-title mt-4" style="margin-top:10px">ERP SYNC</div>
+      <div class="card" style="padding:16px;background:var(--surf-low)">
+        <div class="flex items-center gap-10" style="margin-bottom:12px">
+          <div style="width:12px;height:12px;border-radius:50%;flex-shrink:0" id="erp-dot"></div>
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:600" id="erp-status-text">Checking...</div>
+            <div class="mono-sm text-muted" id="erp-status-detail" style="font-size:10px">Connecting to ERP</div>
+          </div>
         </div>
-        <div class="progress-bar"><div class="fill" id="scanner-sensitivity-bar" style="width:80%"></div></div>
-        <div class="mono-sm text-muted" style="text-align:right;margin-top:4px;font-size:10px" id="scanner-sensitivity-label">Tap to change</div>
+        <div class="flex justify-between" style="margin-bottom:8px">
+          <span class="text-muted" style="font-size:11px">Last synced</span>
+          <span class="mono-sm" id="erp-last-sync" style="font-size:11px">Never</span>
+        </div>
+        <div class="flex justify-between" style="margin-bottom:8px">
+          <span class="text-muted" style="font-size:11px">Pending</span>
+          <span class="mono-sm" id="erp-pending-count" style="font-size:11px">0 items</span>
+        </div>
+        <button class="btn btn-outline w-full" onclick="doManualSync()" id="erp-sync-btn" style="margin-top:8px;font-size:13px;padding:10px">
+          <span class="material-symbols-outlined" style="font-size:18px">sync</span>Sync Now
+        </button>
+        <div id="erp-sync-status" class="text-muted" style="text-align:center;font-size:10px;margin-top:6px;display:none"></div>
       </div>
       <div class="grid-2">
         <div class="card" style="padding:16px" onclick="openCustomerManagement()"><span class="material-symbols-outlined text-primary" style="font-size:28px;margin-bottom:10px">group</span><div style="font-size:13px;font-weight:600">Customers</div><div class="mono-sm text-muted" style="font-size:10px">Manage</div></div>
-        <div class="card" style="padding:16px" onclick="triggerSyncNow()"><span class="material-symbols-outlined text-primary" style="font-size:28px;margin-bottom:10px">sync</span><div style="font-size:13px;font-weight:600">Offline Sync</div><div class="mono-sm text-muted" style="font-size:10px">Every 15 mins</div></div>
-        <div class="card" style="padding:16px" onclick="toggleERPTest()"><span class="material-symbols-outlined" id="erp-status-icon" style="font-size:28px;margin-bottom:10px;color:var(--green)">hub</span><div style="font-size:13px;font-weight:600">ERP</div><div class="mono-sm" style="font-size:10px;color:var(--green)" id="erp-status-label">Online</div></div>
+        <div class="card" style="padding:16px" onclick="toggleScannerSensitivity()"><span class="material-symbols-outlined text-primary" style="font-size:28px;margin-bottom:10px">qr_code_scanner</span><div style="font-size:13px;font-weight:600">Scanner</div><div class="mono-sm text-muted" style="font-size:10px" id="scanner-sensitivity-badge-sm">HIGH</div></div>
       </div>
       <button class="btn btn-danger w-full mt-4" onclick="doLogout()" style="margin-bottom:8px"><span class="material-symbols-outlined">logout</span>LOGOUT</button>
       <div class="text-center" style="opacity:.25;padding:12px">
