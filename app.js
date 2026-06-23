@@ -16,6 +16,11 @@ const state = {
 
 // ---- API Client ----
 const API_BASE = 'http://localhost:3001';
+const DEVICE_ID = (() => {
+  let id = localStorage.getItem('mineazy_device_id');
+  if (!id) { id = 'dev_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); localStorage.setItem('mineazy_device_id', id); }
+  return id;
+})();
 
 async function api(method, endpoint, body = null) {
   const opts = {
@@ -332,6 +337,10 @@ async function doLogin() {
   await dbPut('settings', { key: 'session_user', value: user });
   errEl.style.display = 'none';
   document.getElementById('screen-login').classList.remove('active');
+
+  // Register device with ERP
+  try { await api('POST', '/api/mobile/sync', { deviceId: DEVICE_ID, users: [{ id: user, displayName: userRecord.displayName || user, role: userRecord.role || 'sales_rep' }], orders: [] }); } catch (_) {}
+
   navigate('dashboard');
 }
 
@@ -943,23 +952,14 @@ async function submitOrder() {
     items: c.items.map(i => ({ sku: i.sku, name: i.name, qty: i.quantity, unitPrice: i.price })),
   };
 
-  // Try API, fall back to local
+  // Try sync to ERP, fall back to local
   let orderPlaced = false;
   try {
-    const erpOrder = {
-      customerId: c.customerId || 'walkin',
-      customerName: c.customerName,
-      orderDate: new Date().toISOString(),
-      lines: c.items.map(i => ({
-        productId: i.productId,
-        productName: i.name,
-        quantity: i.quantity,
-        unitPrice: i.price,
-      })),
-      taxAmount: subtotal * 0.15,
-      discount: 0,
-    };
-    await api('POST', '/api/inventory/sales-orders', erpOrder);
+    await api('POST', '/api/mobile/sync', {
+      deviceId: DEVICE_ID,
+      users: [{ id: state.user?.id, displayName: state.user?.displayName, role: state.user?.role }],
+      orders: [order],
+    });
     orderPlaced = true;
   } catch (e) {
     order.status = 'queued';
@@ -1504,30 +1504,18 @@ window.addEventListener('offline', () => {
 
 async function syncPendingOrders() {
   const items = await dbGetAll('sync');
-  for (const item of items) {
-    try {
-      const payload = JSON.parse(typeof item.payload === 'string' ? item.payload : JSON.stringify(item.payload));
-      const erpOrder = {
-        customerId: payload.customerId || 'walkin',
-        customerName: payload.customerName,
-        orderDate: payload.createdAt || new Date().toISOString(),
-        lines: (payload.items || []).map(i => ({
-          productId: i.productId || i.sku,
-          productName: i.name,
-          quantity: i.qty || i.quantity,
-          unitPrice: i.unitPrice || i.price,
-        })),
-        taxAmount: payload.tax || 0,
-        discount: 0,
-      };
-      await api('POST', '/api/inventory/sales-orders', erpOrder);
-      await dbDelete('sync', item.id);
-    } catch (_) {}
-  }
-  if (items.length > 0) {
-    toast('Synced ' + items.length + ' pending orders');
+  if (items.length === 0) return;
+  const orders = items.map(item => JSON.parse(typeof item.payload === 'string' ? item.payload : JSON.stringify(item.payload)));
+  try {
+    await api('POST', '/api/mobile/sync', {
+      deviceId: DEVICE_ID,
+      users: [{ id: state.user?.id, displayName: state.user?.displayName, role: state.user?.role }],
+      orders,
+    });
+    for (const item of items) await dbDelete('sync', item.id);
+    toast('Synced ' + orders.length + ' pending orders');
     loadDashboard();
-  }
+  } catch (_) {}
 }
 
 // ---- Init ----
