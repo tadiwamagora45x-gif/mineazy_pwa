@@ -15,15 +15,15 @@ const state = {
 };
 
 // ---- API Client ----
-const API_BASE = 'https://api.mineazy.com';
+const API_BASE = 'http://localhost:3001';
 
 async function api(method, endpoint, body = null) {
   const opts = {
     method,
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
   };
   if (body) opts.body = JSON.stringify(body);
-  if (state.user?.token) opts.headers['Authorization'] = 'Bearer ' + state.user.token;
 
   const controller = new AbortController();
   opts.signal = controller.signal;
@@ -32,14 +32,37 @@ async function api(method, endpoint, body = null) {
   try {
     const resp = await fetch(API_BASE + endpoint, opts);
     clearTimeout(timer);
-    if (resp.status === 401) { doLogout(); throw new Error('Session expired'); }
-    if (!resp.ok) throw new Error('API error ' + resp.status);
+    if (resp.status === 401) throw new Error('Unauthorized');
+    if (!resp.ok) {
+      const errData = await resp.json().catch(() => ({}));
+      throw new Error(errData.error || 'API error ' + resp.status);
+    }
     return resp.status === 204 ? {} : await resp.json();
   } catch (e) {
     clearTimeout(timer);
     if (e.name === 'AbortError') throw new Error('Network timeout');
     throw e;
   }
+}
+
+async function erpLogin(email, password) {
+  const csrfResp = await fetch(API_BASE + '/api/auth/csrf', { credentials: 'include' });
+  const csrfData = await csrfResp.json();
+  const csrfToken = csrfData?.csrfToken;
+  if (!csrfToken) throw new Error('Could not get CSRF token');
+
+  const resp = await fetch(API_BASE + '/api/auth/callback/credentials', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ csrfToken, email, password, redirect: 'false', json: 'true' }),
+    credentials: 'include',
+    redirect: 'manual',
+  });
+  if (resp.status !== 200 && resp.status !== 302) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error || err.message || 'Login failed');
+  }
+  return resp;
 }
 
 // ---- IndexedDB ----
@@ -277,6 +300,22 @@ async function doLogin() {
   if (!user || !pass) { errEl.style.display = 'block'; errEl.textContent = 'Enter username and password'; return; }
 
   const userRecord = await dbGet('users', user);
+
+  // Try ERP login when online
+  if (state.isOnline) {
+    try {
+      await erpLogin(user, pass);
+      console.log('ERP login successful');
+    } catch (e) {
+      if (!userRecord) {
+        errEl.style.display = 'block';
+        errEl.textContent = 'ERP login failed: ' + e.message;
+        return;
+      }
+      console.log('ERP login failed, using offline auth');
+    }
+  }
+
   if (!userRecord) { errEl.style.display = 'block'; errEl.textContent = 'User not found'; return; }
 
   const passwordHash = hashPassword(pass);
@@ -907,10 +946,22 @@ async function submitOrder() {
   // Try API, fall back to local
   let orderPlaced = false;
   try {
-    await api('POST', '/api/v1/orders', order);
+    const erpOrder = {
+      customerId: c.customerId || 'walkin',
+      customerName: c.customerName,
+      orderDate: new Date().toISOString(),
+      lines: c.items.map(i => ({
+        productId: i.productId,
+        productName: i.name,
+        quantity: i.quantity,
+        unitPrice: i.price,
+      })),
+      taxAmount: subtotal * 0.15,
+      discount: 0,
+    };
+    await api('POST', '/api/inventory/sales-orders', erpOrder);
     orderPlaced = true;
   } catch (e) {
-    // Offline: save to sync queue
     order.status = 'queued';
     await dbPut('sync', { payload: JSON.stringify(order), createdAt: new Date().toISOString(), status: 'pending' });
     toast('Saved offline - will sync when connected');
@@ -1456,7 +1507,20 @@ async function syncPendingOrders() {
   for (const item of items) {
     try {
       const payload = JSON.parse(typeof item.payload === 'string' ? item.payload : JSON.stringify(item.payload));
-      await api('POST', '/api/v1/orders', payload);
+      const erpOrder = {
+        customerId: payload.customerId || 'walkin',
+        customerName: payload.customerName,
+        orderDate: payload.createdAt || new Date().toISOString(),
+        lines: (payload.items || []).map(i => ({
+          productId: i.productId || i.sku,
+          productName: i.name,
+          quantity: i.qty || i.quantity,
+          unitPrice: i.unitPrice || i.price,
+        })),
+        taxAmount: payload.tax || 0,
+        discount: 0,
+      };
+      await api('POST', '/api/inventory/sales-orders', erpOrder);
       await dbDelete('sync', item.id);
     } catch (_) {}
   }
