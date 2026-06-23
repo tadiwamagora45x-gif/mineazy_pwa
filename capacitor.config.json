@@ -1,5 +1,9 @@
 {
   "appId": "com.mineazy.sales",
   "appName": "Mineazy Mobile POS",
-  "webDir": "www"
+  "webDir": "www",
+  "server": {
+    "url": "http://192.168.1.147:3000",
+    "cleartext": true
+  }
 }
