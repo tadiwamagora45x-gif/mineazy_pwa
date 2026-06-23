@@ -163,7 +163,7 @@ input:focus{border-color:var(--primary);border-width:2px}
     <div class="topbar">
       <h1>Mineazy Mobile POS</h1>
       <div class="actions">
-        <button onclick="navigate('admin')" style="color:var(--primary-dim)" title="ERP Dashboard"><span class="material-symbols-outlined">monitoring</span></button>
+        <button onclick="window.open('http://localhost:3002','_blank')" style="color:var(--primary-dim)" title="Admin Dashboard"><span class="material-symbols-outlined">monitoring</span></button>
         <button onclick="openScanner()" style="color:var(--primary-dim)"><span class="material-symbols-outlined">qr_code_scanner</span></button>
       </div>
     </div>
@@ -350,29 +350,6 @@ input:focus{border-color:var(--primary);border-width:2px}
   </div>
 
   <!-- ADMIN DASHBOARD SCREEN -->
-  <div id="screen-admin" class="screen">
-    <div class="topbar">
-      <h1>ERP Dashboard</h1>
-      <div class="actions">
-        <button onclick="loadAdminDashboard()" style="color:var(--primary-dim)"><span class="material-symbols-outlined">refresh</span></button>
-      </div>
-    </div>
-    <div class="p-gutter" style="display:flex;flex-direction:column;gap:14px">
-      <div class="grid-2">
-        <div class="stat-card" id="admin-kpi-devices"><span class="label">Devices</span><span class="value">--</span></div>
-        <div class="stat-card" id="admin-kpi-online"><span class="label">Online Now</span><span class="value">--</span></div>
-        <div class="stat-card" id="admin-kpi-orders"><span class="label">Total Orders</span><span class="value">--</span></div>
-        <div class="stat-card" id="admin-kpi-sales"><span class="label">Total Sales</span><span class="value">--</span></div>
-      </div>
-      <div style="display:flex;gap:6px;overflow-x:auto">
-        <button class="cat-tab active" onclick="switchAdminTab('devices',this)">Devices</button>
-        <button class="cat-tab" onclick="switchAdminTab('orders',this)">Orders</button>
-        <button class="cat-tab" onclick="switchAdminTab('users',this)">Users</button>
-        <button class="cat-tab" onclick="switchAdminTab('customers',this)">Customers</button>
-      </div>
-      <div id="admin-tab-content"><p class="text-muted text-center" style="padding:20px">Loading...</p></div>
-    </div>
-  </div>
 
   <!-- SETTINGS SCREEN -->
   <div id="screen-settings" class="screen">

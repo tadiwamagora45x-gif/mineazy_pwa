@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Mineazy Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0f0f0f;--surf:#1a1a1a;--surf-high:#252525;--txt:#e5e2e1;--txt-var:#a0a0a0;--primary:#fabd00;--primary-dim:#e5a800;--green:#4caf50;--red:#ff5252;--orange:#ff9800;--radius:6px;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);font-size:14px;background:var(--bg);color:var(--txt);min-height:100vh}
+.login-bg{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-card{background:var(--surf);border:1px solid #333;border-radius:var(--radius);padding:40px;width:100%;max-width:380px;text-align:center}
+.login-card h1{font-size:24px;font-weight:700;color:var(--primary);margin-bottom:6px}
+.login-card input{display:block;width:100%;padding:12px;margin-bottom:12px;background:var(--surf-high);border:1px solid #444;border-radius:var(--radius);color:var(--txt);font-size:14px;outline:none}
+.login-card input:focus{border-color:var(--primary)}
+.login-card button{width:100%;padding:12px;background:var(--primary);color:#1a1a00;border:none;border-radius:var(--radius);font-weight:700;font-size:14px;cursor:pointer}
+.login-card .err{color:var(--red);font-size:12px;margin-top:8px;display:none}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:var(--surf);border-bottom:1px solid #333;position:sticky;top:0;z-index:10}
+.topbar h1{font-size:18px;color:var(--primary)}
+.topbar button{background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;font-weight:600}
+.content{padding:24px;max-width:1200px;margin:0 auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.kpi{background:var(--surf);border:1px solid #333;border-radius:var(--radius);padding:16px}
+.kpi .label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--txt-var);margin-bottom:4px}
+.kpi .value{font-size:28px;font-weight:700;color:var(--primary)}
+.tabs{display:flex;gap:4px;margin-bottom:16px;overflow-x:auto}
+.tab{padding:8px 18px;border-radius:var(--radius);font-size:12px;font-weight:700;cursor:pointer;border:1px solid #333;background:transparent;color:var(--txt-var);white-space:nowrap}
+.tab.active{background:var(--primary);color:#1a1a00;border-color:var(--primary)}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 12px;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--txt-var);border-bottom:2px solid #333}
+td{padding:10px 12px;border-bottom:1px solid #222;font-size:13px}
+tr:hover{background:var(--surf-high)}
+.badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;text-transform:uppercase}
+.badge-green{background:rgba(76,175,80,.15);color:var(--green)}
+.badge-red{background:rgba(255,82,82,.15);color:var(--red)}
+.badge-yellow{background:rgba(255,152,0,.15);color:var(--orange)}
+.badge-primary{background:rgba(250,189,0,.15);color:var(--primary)}
+.mono{font-family:var(--mono);font-size:12px}
+.text-muted{color:var(--txt-var)}
+.text-primary{color:var(--primary)}
+.loading{text-align:center;padding:40px;color:var(--txt-var)}
+.spinner{width:32px;height:32px;border:3px solid #333;border-top-color:var(--primary);border-radius:50%;animation:spin .6s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.search-box{width:100%;max-width:300px;padding:8px 12px;margin-bottom:14px;background:var(--surf-high);border:1px solid #444;border-radius:var(--radius);color:var(--txt);font-size:13px;outline:none}
+.search-box:focus{border-color:var(--primary)}
+</style>
+</head>
+<body>
+<div id="login-page" class="login-bg">
+  <div class="login-card">
+    <h1>Mineazy Admin</h1>
+    <p class="text-muted" style="margin-bottom:24px;font-size:11px">ERP Management Dashboard</p>
+    <input id="login-email" type="text" placeholder="Email" autocomplete="username"/>
+    <input id="login-pass" type="password" placeholder="Password" autocomplete="current-password"/>
+    <button onclick="doLogin()">Sign In</button>
+    <p class="err" id="login-err"></p>
+  </div>
+</div>
+
+<div id="app-page" style="display:none">
+  <div class="topbar">
+    <h1>Mineazy Admin Dashboard</h1>
+    <button onclick="doLogout()">Logout</button>
+  </div>
+  <div class="content">
+    <div class="grid" id="kpi-row"></div>
+    <div class="tabs" id="tabs-row"></div>
+    <div id="tab-content"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
