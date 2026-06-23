@@ -4,7 +4,7 @@ const path = require('path');
 
 const PORT = 3000;
 const ROOT = path.join(__dirname, 'www');
-const ERP_URL = 'http://localhost:3001';
+const ERP_URL = 'http://192.168.1.147:3001';
 
 const mimeTypes = {
   '.html': 'text/html',
@@ -19,20 +19,19 @@ http.createServer((req, res) => {
   // Proxy /api/* requests to ERP
   if (req.url.startsWith('/api/')) {
     const opts = {
-      hostname: 'localhost',
+      hostname: '127.0.0.1',
       port: 3001,
       path: req.url,
       method: req.method,
       headers: { ...req.headers, host: 'localhost:3001' },
+      timeout: 10000,
     };
     const proxy = http.request(opts, (erpRes) => {
       res.writeHead(erpRes.statusCode, erpRes.headers);
       erpRes.pipe(res);
     });
-    proxy.on('error', () => {
-      res.writeHead(502);
-      res.end('ERP unreachable');
-    });
+    proxy.on('timeout', () => { proxy.destroy(); res.writeHead(504); res.end('ERP timeout'); });
+    proxy.on('error', () => { res.writeHead(502); res.end('ERP unreachable'); });
     req.pipe(proxy);
     return;
   }
