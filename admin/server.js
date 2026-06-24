@@ -15,24 +15,52 @@ const mimeTypes = {
   '.css': 'text/css',
 };
 
+// Store ERP session cookies per browser session
+let erpCookies = '';
+
+function proxyToERP(req, res) {
+  const opts = {
+    hostname: '127.0.0.1',
+    port: 3001,
+    path: req.url,
+    method: req.method,
+    headers: { ...req.headers, host: 'localhost:3001', cookie: erpCookies },
+    timeout: 15000,
+  };
+
+  const proxy = http.request(opts, (erpRes) => {
+    // Capture any new cookies from ERP
+    if (erpRes.headers['set-cookie']) {
+      const newCookies = Array.isArray(erpRes.headers['set-cookie']) ? erpRes.headers['set-cookie'] : [erpRes.headers['set-cookie']];
+      for (const c of newCookies) {
+        const parts = c.split(';')[0];
+        const [name, val] = parts.split('=');
+        if (name && val) {
+          const existing = erpCookies.split('; ').filter(x => !x.startsWith(name + '='));
+          erpCookies = [...existing, `${name}=${val}`].filter(Boolean).join('; ');
+        }
+      }
+    }
+
+    const headers = { ...erpRes.headers };
+    delete headers['set-cookie'];
+    // Forward ERP cookies back to browser so auth works in browser too
+    if (erpRes.headers['set-cookie']) {
+      const cookies = Array.isArray(erpRes.headers['set-cookie']) ? erpRes.headers['set-cookie'] : [erpRes.headers['set-cookie']];
+      res.setHeader('Set-Cookie', cookies.map(c => c.replace(/Domain=[^;]+;?/i, '').replace(/domain=[^;]+;?/i, '')));
+    }
+    res.writeHead(erpRes.statusCode, headers);
+    erpRes.pipe(res);
+  });
+
+  proxy.on('timeout', () => { proxy.destroy(); res.writeHead(504); res.end('ERP timeout'); });
+  proxy.on('error', (e) => { res.writeHead(502); res.end('ERP unreachable: ' + e.message); });
+  req.pipe(proxy);
+}
+
 http.createServer((req, res) => {
-  // Proxy /api/* to ERP
   if (req.url.startsWith('/api/')) {
-    const opts = {
-      hostname: '127.0.0.1',
-      port: 3001,
-      path: req.url,
-      method: req.method,
-      headers: { ...req.headers, host: 'localhost:3001' },
-      timeout: 10000,
-    };
-    const proxy = http.request(opts, (erpRes) => {
-      res.writeHead(erpRes.statusCode, erpRes.headers);
-      erpRes.pipe(res);
-    });
-    proxy.on('timeout', () => { proxy.destroy(); res.writeHead(504); res.end('ERP timeout'); });
-    proxy.on('error', () => { res.writeHead(502); res.end('ERP unreachable'); });
-    req.pipe(proxy);
+    proxyToERP(req, res);
     return;
   }
 
