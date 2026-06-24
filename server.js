@@ -51,7 +51,7 @@ http.createServer((req, res) => {
     });
     res.end(data);
   });
-}).listen(PORT, () => {
+}).listen(PORT, '0.0.0.0', () => {
   console.log('Mineazy Mobile POS running at http://localhost:' + PORT);
   console.log('ERP proxy: /api/* -> ' + ERP_URL);
 });

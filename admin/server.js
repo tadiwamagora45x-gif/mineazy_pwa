@@ -71,7 +71,7 @@ http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' });
     res.end(data);
   });
-}).listen(PORT, () => {
+}).listen(PORT, '0.0.0.0', () => {
   console.log('Admin Dashboard running at http://localhost:' + PORT);
   console.log('ERP proxy: /api/* -> ' + ERP_URL);
 });
