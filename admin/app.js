@@ -195,10 +195,14 @@ function renderCustomers(data, el) {
 async function renderProducts(el) {
   el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading products...</div>';
   try {
-    const data = await apiFetch('/inventory/products?limit=200');
+    const data = await apiFetch('/inventory/products?limit=5000');
     const products = data.items || data || [];
-    if (products.length === 0) { el.innerHTML = '<div class="loading">No products</div>'; return; }
+    if (products.length === 0) { 
+      el.innerHTML = '<div class="loading"><p style="font-size:16px;margin-bottom:8px">No products in ERP database</p><p class="text-muted">Products need to be imported into the ERP. The PWA has 4,182 products locally.<br/>Run <b>node import_products.js</b> from the mineazy_pwa folder to import them.</p></div>'; 
+      return; 
+    }
     el.innerHTML = `
+      <div class="text-muted" style="margin-bottom:8px">${products.length} products</div>
       <input class="search-box" type="text" placeholder="Search ${products.length} products..." oninput="filterTable(this,'prod-table')"/>
       <table id="prod-table">
         <thead><tr><th>Code</th><th>Name</th><th>Price</th><th>Stock</th><th>Unit</th></tr></thead>
@@ -213,7 +217,7 @@ async function renderProducts(el) {
         `).join('')}</tbody>
       </table>`;
   } catch (_) {
-    el.innerHTML = '<div class="loading">Cannot load products</div>';
+    el.innerHTML = '<div class="loading">Cannot load products. Check ERP connection.</div>';
   }
 }
 
