@@ -15,7 +15,7 @@ const state = {
 };
 
 // ---- API Client ----
-const ERP_DEFAULT = (typeof window !== 'undefined' && window.location.hostname === 'localhost') ? '' : 'http://192.168.1.147:3001';
+const ERP_DEFAULT = (typeof window !== 'undefined' && window.location.hostname === 'localhost') ? '' : 'http://192.168.1.66:3001';
 const API_BASE = localStorage.getItem('erp_api_url') || ERP_DEFAULT;
 function setAPIBase(url) { localStorage.setItem('erp_api_url', url); location.reload(); }
 const DEVICE_ID = (() => {
