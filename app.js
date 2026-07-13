@@ -957,6 +957,8 @@ async function submitOrder() {
   // Try sync to ERP, fall back to local
   let orderPlaced = false;
   try {
+    // Register device first if needed
+    await api('POST', '/api/mobile/device', { deviceId: DEVICE_ID, deviceName: 'Mineazy POS', platform: 'android', appVersion: '1.0' });
     await api('POST', '/api/mobile/sync', {
       deviceId: DEVICE_ID,
       users: [{ id: state.user?.id, displayName: state.user?.displayName, role: state.user?.role }],
@@ -1551,6 +1553,7 @@ async function syncPendingOrders() {
   if (items.length === 0) return;
   const orders = items.map(item => JSON.parse(typeof item.payload === 'string' ? item.payload : JSON.stringify(item.payload)));
   try {
+    await api('POST', '/api/mobile/device', { deviceId: DEVICE_ID, deviceName: 'Mineazy POS', platform: 'android', appVersion: '1.0' });
     await api('POST', '/api/mobile/sync', {
       deviceId: DEVICE_ID,
       users: [{ id: state.user?.id, displayName: state.user?.displayName, role: state.user?.role }],
