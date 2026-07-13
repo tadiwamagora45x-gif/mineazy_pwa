@@ -4,7 +4,7 @@ const path = require('path');
 
 const PORT = 3000;
 const ROOT = path.join(__dirname, 'www');
-const ERP_URL = 'http://192.168.1.147:3001';
+const ERP_URL = 'http://localhost:3005';
 
 const mimeTypes = {
   '.html': 'text/html',
@@ -20,10 +20,10 @@ http.createServer((req, res) => {
   if (req.url.startsWith('/api/')) {
     const opts = {
       hostname: '127.0.0.1',
-      port: 3001,
+      port: 3005,
       path: req.url,
       method: req.method,
-      headers: { ...req.headers, host: 'localhost:3001' },
+      headers: { ...req.headers, host: 'localhost:3005' },
       timeout: 10000,
     };
     const proxy = http.request(opts, (erpRes) => {

@@ -2,9 +2,9 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = 3002;
+const PORT = 3003;
 const ROOT = __dirname;
-const ERP_URL = 'http://localhost:3001';
+const ERP_URL = 'http://localhost:3005';
 
 const mimeTypes = {
   '.html': 'text/html',
@@ -21,10 +21,10 @@ let erpCookies = '';
 function proxyToERP(req, res) {
   const opts = {
     hostname: '127.0.0.1',
-    port: 3001,
+    port: 3005,
     path: req.url,
     method: req.method,
-    headers: { ...req.headers, host: 'localhost:3001', cookie: erpCookies },
+    headers: { ...req.headers, host: 'localhost:3005', cookie: erpCookies },
     timeout: 15000,
   };
 
