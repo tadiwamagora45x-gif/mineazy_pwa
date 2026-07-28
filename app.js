@@ -343,6 +343,7 @@ async function doLogin() {
   // Register device with ERP
   try { await api('POST', '/api/mobile/sync', { deviceId: DEVICE_ID, users: [{ id: user, displayName: userRecord.displayName || user, role: userRecord.role || 'sales_rep' }], orders: [] }); } catch (_) {}
 
+  syncProductsFromERP();
   navigate('dashboard');
 }
 
@@ -1497,6 +1498,8 @@ async function checkERPStatus() {
 function renderERPSyncStatus() {
   const lastSync = localStorage.getItem('erp_last_sync');
   document.getElementById('erp-last-sync').textContent = lastSync ? timeAgo(lastSync) : 'Never';
+  const lastProdSync = localStorage.getItem('erp_last_products_sync');
+  document.getElementById('erp-products-sync').textContent = lastProdSync ? timeAgo(lastProdSync) : 'Never';
   dbGetAll('sync').then(items => {
     document.getElementById('erp-pending-count').textContent = items.length + ' items';
   });
@@ -1516,6 +1519,7 @@ async function doManualSync() {
 
   try {
     await syncPendingOrders();
+    await syncProductsFromERP();
     const now = new Date().toISOString();
     localStorage.setItem('erp_last_sync', now);
     document.getElementById('erp-last-sync').textContent = timeAgo(now);
@@ -1538,6 +1542,7 @@ async function doManualSync() {
 window.addEventListener('online', () => {
   state.isOnline = true;
   syncPendingOrders();
+  syncProductsFromERP();
   if (state.currentScreen === 'settings') { renderSettings(); checkERPStatus(); }
   toast('Back online - syncing...');
 });
@@ -1568,6 +1573,26 @@ async function syncPendingOrders() {
   }
 }
 
+// ---- Sync Products from ERP ----
+async function syncProductsFromERP() {
+  if (!state.isOnline) return;
+  try {
+    const products = await api('GET', '/api/mobile/products');
+    if (products && products.length > 0) {
+      await dbClear('products');
+      await dbPutAll('products', products);
+      console.log('Synced ' + products.length + ' products from ERP');
+      localStorage.setItem('erp_last_products_sync', new Date().toISOString());
+      allProductsCache = [];
+      loadCategoryTabs();
+      return true;
+    }
+  } catch (e) {
+    console.log('ERP products sync failed:', e.message);
+  }
+  return false;
+}
+
 // ---- Init ----
 async function init() {
   // Restore saved theme
@@ -1588,7 +1613,12 @@ async function init() {
   }
 
   await openDB();
-  await seedDemoProducts();
+  if (state.isOnline) {
+    const synced = await syncProductsFromERP();
+    if (!synced) await seedDemoProducts();
+  } else {
+    await seedDemoProducts();
+  }
   await seedDemoCustomers();
   const restored = await tryRestoreSession();
   if (restored) {
